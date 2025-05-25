@@ -1,0 +1,8 @@
+<h1>Featured Article</h1>
+
+<em><a href="{{ url() }}" target="_blank">{{ title() }}</a></em>
+<hr />
+@if ( thumbnailUrl() && thumbnailUrl().trim() != '' ) {
+    <img src="{{ thumbnailUrl() }}" />
+}
+<p>{{ description() }}</p>
