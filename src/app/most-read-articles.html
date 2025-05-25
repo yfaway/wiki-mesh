@@ -1,0 +1,30 @@
+<style>
+    .header-article {
+        text-align: left
+    }
+</style>
+
+<h1>Most Read Article</h1>
+
+@if ( loading() ) 
+{
+    <p>Loading...</p>
+}
+
+<table>
+    <tr>
+        <th class='header-article'>Article</th>
+        <th>Views</th>
+        <th>Namespace</th>
+    </tr>
+@for ( article of articles(); track article.title ) {
+    <tr>
+        <td>
+            <div><a href="{{ article.url }}" target="_blank">{{ article.title }}</a></div>
+            <div>{{ article.description }}</div>
+        </td>
+        <td>{{ article.views | number: '1.0-0'}}</td>
+        <td>{{ article.namespace }}</td>
+    </tr>
+}
+</table>

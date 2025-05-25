@@ -1,41 +1,50 @@
-import { Component, effect, signal, viewChild } from '@angular/core';
+import { Component, signal, viewChild } from '@angular/core';
+import { DatePipe } from '@angular/common';
 import { RouterOutlet } from '@angular/router';
 import { FeaturedArticles } from './featured-articles';
+import { MostReadArticle, MostReadArticlesComponent } from './most-read-articles';
 import * as tokens from '../../tokens.json';
+import { Title } from '@angular/platform-browser';
+
+/**
+ * The root component to control several sections:
+ *   - Featured articles
+ *   - Previous day's most read articles
+ *   - Today's news
+ */
 
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet, FeaturedArticles],
+  imports: [RouterOutlet, DatePipe, FeaturedArticles, MostReadArticlesComponent],
   templateUrl: './app.component.html',
   styleUrl: './app.component.css'
 })
 export class AppComponent {
   readonly token = tokens.wikimedia
-  readonly title = signal("N/A");
 
   featuredArticle = viewChild.required(FeaturedArticles);
-
-  private currentDate = new Date();
+  mostReadComponent = viewChild.required(MostReadArticlesComponent);
+  currentDate = signal(new Date());
 
   constructor() {
   }
 
   isOnToday = () => {
-    return this.currentDate.getUTCDate() == new Date().getUTCDate();
+    return this.currentDate().getUTCDate() == new Date().getUTCDate();
   }
 
   displayToday = () => {
-    this.currentDate = new Date();
+    this.currentDate.set(new Date());
     this.getData();
   };
 
   displayPrevDay = () => {
-    this.currentDate.setDate(this.currentDate.getDate() - 1);
+    this.currentDate().setDate(this.currentDate().getDate() - 1);
     this.getData();
   }
 
   displayNextDay = () => {
-    this.currentDate.setDate(this.currentDate.getDate() + 1);
+    this.currentDate().setDate(this.currentDate().getDate() + 1);
     this.getData();
   }
 
@@ -44,13 +53,13 @@ export class AppComponent {
   }
 
   async getData() {
-    let normalizedMonth = this.currentDate.getUTCMonth() + 1 < 10 
-        ? "0" + (this.currentDate.getUTCMonth() + 1).toString()
-        : (this.currentDate.getUTCMonth() + 1).toString();
-    let normalizedDay = this.currentDate.getUTCDate()< 10 
-        ? "0" + this.currentDate.getUTCDate().toString() 
-        : this.currentDate.getUTCDate().toString();
-    let dateString = `${ this.currentDate.getUTCFullYear() }/${ normalizedMonth}/${ normalizedDay }`;
+    let normalizedMonth = this.currentDate().getUTCMonth() + 1 < 10 
+        ? "0" + (this.currentDate().getUTCMonth() + 1).toString()
+        : (this.currentDate().getUTCMonth() + 1).toString();
+    let normalizedDay = this.currentDate().getUTCDate()< 10 
+        ? "0" + this.currentDate().getUTCDate().toString() 
+        : this.currentDate().getUTCDate().toString();
+    let dateString = `${ this.currentDate().getUTCFullYear() }/${ normalizedMonth}/${ normalizedDay }`;
 
     let response = await fetch(`https://api.wikimedia.org/feed/v1/wikipedia/en/featured/${dateString}`,
       {
@@ -62,10 +71,24 @@ export class AppComponent {
     );
     response.json().then((value) => {
       console.log(value);
-      this.title.set(value.mostread.articles[0].description)
-
       this.featuredArticle().update(value.tfa.titles.canonical, 
         value.tfa.thumbnail.source, value.tfa.description, value.tfa.content_urls.desktop.page);
+
+      let articles : Array<MostReadArticle> = [];
+      for (let article of value.mostread.articles) {
+        let obj : MostReadArticle = {
+          date: article.date,
+          rank: article.rank,
+          views: article.views,
+          namespace: article.namespace.text,
+          title: article.titles.canonical,
+          description: article.description,
+          url: article.content_urls.desktop.page
+        };
+
+        articles.push(obj);
+      }
+      this.mostReadComponent().articles.set(articles);
     });
   }
 }
