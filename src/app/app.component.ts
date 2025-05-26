@@ -4,7 +4,6 @@ import { RouterOutlet } from '@angular/router';
 import { FeaturedArticles } from './featured-articles';
 import { MostReadArticle, MostReadArticlesComponent } from './most-read-articles';
 import * as tokens from '../../tokens.json';
-import { Title } from '@angular/platform-browser';
 
 /**
  * The root component to control several sections:

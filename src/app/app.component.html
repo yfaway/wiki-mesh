@@ -63,74 +63,73 @@
     position: relative;
   }
 
-  .angular-logo {
-    max-width: 9.2rem;
-  }
-
-  .content {
-    display: flex;
-    justify-content: space-around;
+  .responsive {
+    padding: 0 6px;
+    float: center;
     width: 100%;
-    max-width: 700px;
-    margin-bottom: 3rem;
   }
 
-  .content h1 {
-    margin-top: 1.75rem;
-  }
-
-  .content p {
-    margin-top: 1.5rem;
-  }
-
-  .divider {
-    width: 1px;
-    background: var(--red-to-pink-to-purple-vertical-gradient);
-    margin-inline: 0.5rem;
-  }
-
-  /*
-  @media screen and (max-width: 650px) {
-    .content {
-      flex-direction: column;
-      width: max-content;
+  @media only screen and (max-width: 700px){
+    .responsive {
+      width: 49.99999%;
+      margin: 6px 0;
     }
+  }
 
-    .divider {
-      height: 1px;
+  @media only screen and (max-width: 500px){
+    .responsive {
       width: 100%;
-      background: var(--red-to-pink-to-purple-horizontal-gradient);
-      margin-block: 1.5rem;
     }
   }
-    */
+
+  table {
+    width: 100%
+  }
+
+  td {
+    vertical-align: top;
+  }
+
+  .controls {
+    font-size: 2rem;
+  }
+
+  .current-date {
+    font-size: smaller;
+    font-style: italic;
+  }
 </style>
 
-<main class="main">
-  <div class="content">
-    <div class="left-side">
-      <section id="control">
-        <button (click)="displayPrevDay()">Previous Day</button>
-        @if ( ! isOnToday() ) {
-          &nbsp;
-          <button [disabled] = "isOnToday()" (click)="displayToday()">Today</button>
-          &nbsp;
-          <button [disabled] = "isOnToday()" (click)="displayNextDay()">Next Day</button>
-        }
-        <div><small>{{ currentDate() | date }}</small></div>
-      </section>
-
-      <section>
-        <feature-articles />
-      </section>
-    </div>
-    <div class="divider" role="separator" aria-label="Divider"></div>
-    <div class="right-side">
-      <section>
-        <most-read-articles />
-      </section>
-    </div>
-  </div>
+<main class="responsive">
+  <table>
+    <tr>
+      <td colspan="2">
+        <div id="controls">
+          <button (click)="displayPrevDay()">Previous Day</button>
+          @if ( ! isOnToday() ) {
+            &nbsp;
+            <button [disabled] = "isOnToday()" (click)="displayToday()">Today</button>
+            &nbsp;
+            <button [disabled] = "isOnToday()" (click)="displayNextDay()">Next Day</button>
+          }
+        </div>
+        <div class="current-date">{{ currentDate() | date }}</div>
+        <hr />
+      </td>
+    </tr>
+    <tr>
+      <td>
+        <section>
+          <feature-articles />
+        </section>
+      </td>
+      <td>
+        <section>
+          <most-read-articles />
+        </section>
+      </td>
+    </tr>
+  </table>
 </main>
 
 <router-outlet />

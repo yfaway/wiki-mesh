@@ -1,7 +1,20 @@
+<style>
+img {
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  padding: 5px;
+  max-width: 100%;
+  height: auto;
+}
+
+.title {
+  font-style: italic;
+}
+</style>
+
 <h1>Featured Article</h1>
 
-<em><a href="{{ url() }}" target="_blank">{{ title() }}</a></em>
-<hr />
+<div class="title"><a href="{{ url() }}" target="_blank">{{ title() }}</a></div>
 @if ( thumbnailUrl() && thumbnailUrl().trim() != '' ) {
     <img src="{{ thumbnailUrl() }}" />
 }
