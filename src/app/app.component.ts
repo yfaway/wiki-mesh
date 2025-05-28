@@ -39,11 +39,17 @@ export class AppComponent {
 
   displayPrevDay = () => {
     this.currentDate().setDate(this.currentDate().getDate() - 1);
+    // need to create a new Date obj; otherwise Angular won't update the dynamic rendering
+    this.currentDate.set(new Date(this.currentDate().getTime()));
+
     this.getData();
   }
 
   displayNextDay = () => {
     this.currentDate().setDate(this.currentDate().getDate() + 1);
+    // need to create a new Date obj; otherwise Angular won't update the dynamic rendering
+    this.currentDate.set(new Date(this.currentDate().getTime()));
+
     this.getData();
   }
 
