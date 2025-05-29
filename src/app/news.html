@@ -1,0 +1,11 @@
+
+<div id="news">
+    <h1>News</h1>
+    <ul>
+    @for ( article of articles(); track article.story_in_html ) {
+        <li>
+            <div [innerHTML]="article.story_in_html | safeHtml"></div>
+        </li>
+    }
+    </ul>
+</div>

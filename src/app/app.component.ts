@@ -3,6 +3,7 @@ import { DatePipe } from '@angular/common';
 import { RouterOutlet } from '@angular/router';
 import { FeaturedArticles } from './featured-articles';
 import { MostReadArticle, MostReadArticlesComponent } from './most-read-articles';
+import { News, NewsComponent } from './news';
 import * as tokens from '../../tokens.json';
 
 /**
@@ -14,7 +15,7 @@ import * as tokens from '../../tokens.json';
 
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet, DatePipe, FeaturedArticles, MostReadArticlesComponent],
+  imports: [RouterOutlet, DatePipe, FeaturedArticles, MostReadArticlesComponent, NewsComponent],
   templateUrl: './app.component.html',
   styleUrl: './app.component.css'
 })
@@ -23,6 +24,7 @@ export class AppComponent {
 
   featuredArticle = viewChild.required(FeaturedArticles);
   mostReadComponent = viewChild.required(MostReadArticlesComponent);
+  newsComponent = viewChild.required(NewsComponent);
   currentDate = signal(new Date());
 
   constructor() {
@@ -94,6 +96,15 @@ export class AppComponent {
         articles.push(obj);
       }
       this.mostReadComponent().articles.set(articles);
+
+      let newsArticles: Array<News> = [];
+      for (let obj of value.news) {
+        let news : News = {
+          story_in_html: obj.story
+        }
+        newsArticles.push(news);
+      }
+      this.newsComponent().articles.set(newsArticles);
     });
   }
 }
