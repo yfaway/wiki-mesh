@@ -1,6 +1,7 @@
 import { Component, signal, viewChild } from '@angular/core';
 import { DatePipe } from '@angular/common';
 import { RouterOutlet } from '@angular/router';
+import { Controls } from './controls';
 import { FeaturedArticles } from './featured-articles';
 import { MostReadArticle, MostReadArticlesComponent } from './most-read-articles';
 import { News, NewsComponent } from './news';
@@ -15,7 +16,7 @@ import * as tokens from '../../tokens.json';
 
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet, DatePipe, FeaturedArticles, MostReadArticlesComponent, NewsComponent],
+  imports: [RouterOutlet, Controls, FeaturedArticles, MostReadArticlesComponent, NewsComponent],
   templateUrl: './app.component.html',
   styleUrl: './app.component.css'
 })
@@ -30,73 +31,34 @@ export class AppComponent {
   constructor() {
   }
 
-  isOnToday = () => {
-    return this.currentDate().getUTCDate() == new Date().getUTCDate();
+  resetComponents() {
+    this.featuredArticle().reset()
+    this.mostReadComponent().articles.set(new Array<MostReadArticle>());
+    this.newsComponent().articles.set(new Array<News>());
   }
 
-  displayToday = () => {
-    this.currentDate.set(new Date());
-    this.getData();
-  };
+  updateComponents(value: any) {
+    console.log(value);
+    this.featuredArticle().update(value.tfa.titles.canonical, 
+      value.tfa.thumbnail.source, value.tfa.description, value.tfa.content_urls.desktop.page);
 
-  displayPrevDay = () => {
-    this.currentDate().setDate(this.currentDate().getDate() - 1);
-    // need to create a new Date obj; otherwise Angular won't update the dynamic rendering
-    this.currentDate.set(new Date(this.currentDate().getTime()));
+    let articles : Array<MostReadArticle> = [];
+    for (let article of value.mostread.articles) {
+      let obj : MostReadArticle = {
+        date: article.date,
+        rank: article.rank,
+        views: article.views,
+        namespace: article.namespace.text,
+        title: article.titles.canonical,
+        description: article.description,
+        url: article.content_urls.desktop.page
+      };
 
-    this.getData();
-  }
+      articles.push(obj);
+    }
+    this.mostReadComponent().articles.set(articles);
 
-  displayNextDay = () => {
-    this.currentDate().setDate(this.currentDate().getDate() + 1);
-    // need to create a new Date obj; otherwise Angular won't update the dynamic rendering
-    this.currentDate.set(new Date(this.currentDate().getTime()));
-
-    this.getData();
-  }
-
-  ngOnInit() {
-    this.getData();
-  }
-
-  async getData() {
-    let normalizedMonth = this.currentDate().getUTCMonth() + 1 < 10 
-        ? "0" + (this.currentDate().getUTCMonth() + 1).toString()
-        : (this.currentDate().getUTCMonth() + 1).toString();
-    let normalizedDay = this.currentDate().getUTCDate()< 10 
-        ? "0" + this.currentDate().getUTCDate().toString() 
-        : this.currentDate().getUTCDate().toString();
-    let dateString = `${ this.currentDate().getUTCFullYear() }/${ normalizedMonth}/${ normalizedDay }`;
-
-    let response = await fetch(`https://api.wikimedia.org/feed/v1/wikipedia/en/featured/${dateString}`,
-      {
-          headers: {
-              'Authorization': 'Bearer ' + this.token,
-              'Api-User-Agent': 'test-angular'
-          }
-      }
-    );
-    response.json().then((value) => {
-      console.log(value);
-      this.featuredArticle().update(value.tfa.titles.canonical, 
-        value.tfa.thumbnail.source, value.tfa.description, value.tfa.content_urls.desktop.page);
-
-      let articles : Array<MostReadArticle> = [];
-      for (let article of value.mostread.articles) {
-        let obj : MostReadArticle = {
-          date: article.date,
-          rank: article.rank,
-          views: article.views,
-          namespace: article.namespace.text,
-          title: article.titles.canonical,
-          description: article.description,
-          url: article.content_urls.desktop.page
-        };
-
-        articles.push(obj);
-      }
-      this.mostReadComponent().articles.set(articles);
-
+    if (value.news) {
       let newsArticles: Array<News> = [];
       for (let obj of value.news) {
         let news : News = {
@@ -105,6 +67,6 @@ export class AppComponent {
         newsArticles.push(news);
       }
       this.newsComponent().articles.set(newsArticles);
-    });
-  }
+    }
+  };
 }

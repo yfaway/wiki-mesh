@@ -1,0 +1,10 @@
+<div id="controls">
+    <button (click)="displayPrevDay()">Previous Day</button>
+    @if ( ! isOnToday() ) {
+    &nbsp;
+    <button [disabled] = "isOnToday()" (click)="displayToday()">Today</button>
+    &nbsp;
+    <button [disabled] = "isOnToday()" (click)="displayNextDay()">Next Day</button>
+    }
+</div>
+<div class="current-date">{{ currentDate() | date }}</div>

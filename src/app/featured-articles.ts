@@ -10,6 +10,13 @@ export class FeaturedArticles {
   description = signal('');
   url = signal('');
 
+  reset = () => {
+    this.title.set("Loading...");
+    this.thumbnailUrl.set('');
+    this.description.set('');
+    this.url.set('');
+  }
+
   update = (aTitle: string, thumpnailUrl: string, description: string, url: string) => {
     this.title.set(aTitle);
     this.thumbnailUrl.set(thumpnailUrl);
