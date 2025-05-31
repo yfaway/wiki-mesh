@@ -1,6 +1,7 @@
 import { Output, Component, EventEmitter, signal } from '@angular/core';
-import { DatePipe } from '@angular/common';
+import { DatePipe, NgFor } from '@angular/common';
 import * as tokens from '../../tokens.json';
+import { FormsModule } from '@angular/forms';
 
 /**
  * Contains the button to navigate the day.
@@ -8,7 +9,7 @@ import * as tokens from '../../tokens.json';
 
 @Component({
   selector: 'controls',
-  imports: [DatePipe],
+  imports: [DatePipe, FormsModule, NgFor],
   templateUrl: './controls.html',
 })
 export class Controls {
@@ -18,6 +19,27 @@ export class Controls {
   readonly token = tokens.wikimedia
 
   currentDate = signal(new Date());
+  selectedValue = "en";
+
+  supportedLanguages = [
+    { "id": "bs", "name": "Bosanski" },
+    { "id": "da", "name": "Danskomponent" },
+    { "id": "de", "name": "Deutsch" },
+    { "id": "el", "name": "Ελληνικά" },
+    { "id": "en", "name": "English" },
+    { "id": "es", "name": "Español" },
+    { "id": "fi", "name": "Suomi" },
+    { "id": "fr", "name": "Français" },
+    { "id": "he", "name": "עברית" },
+    { "id": "ko", "name": "한국어" },
+    { "id": "no", "name": "Norsk" },
+    { "id": "pl", "name": "Polski" },
+    { "id": "pt", "name": "Português" },
+    { "id": "ru", "name": "Русский" },
+    { "id": "sco", "name": "Scots" },
+    { "id": "sv", "name": "Svenska" },
+    { "id": "vi", "name": "Tiếng Việt" },
+  ];
 
   constructor() {
   }
@@ -47,6 +69,10 @@ export class Controls {
     this.getData();
   }
 
+  updateLanguageId = () => {
+    this.getData();
+  }
+
   ngOnInit() {
     this.getData();
   }
@@ -62,9 +88,10 @@ export class Controls {
         : this.currentDate().getUTCDate().toString();
     let dateString = `${ this.currentDate().getUTCFullYear() }/${ normalizedMonth}/${ normalizedDay }`;
 
-    let storedData = sessionStorage.getItem(dateString);
+    let storageKey = `${this.selectedValue}_${dateString}`
+    let storedData = sessionStorage.getItem(storageKey);
     if ( storedData == null ) {
-      let response = await fetch(`https://api.wikimedia.org/feed/v1/wikipedia/en/featured/${dateString}`,
+      let response = await fetch(`https://api.wikimedia.org/feed/v1/wikipedia/${this.selectedValue}/featured/${dateString}`,
         {
             headers: {
                 'Authorization': 'Bearer ' + this.token,
@@ -73,8 +100,8 @@ export class Controls {
         }
       );
       response.json().then((value) => { 
+        sessionStorage.setItem(storageKey, JSON.stringify(value))
         this.dataAvailable.emit(value);
-        sessionStorage.setItem(dateString, value.stringify())
       });
     } else {
       this.dataAvailable.emit(JSON.parse(storedData));

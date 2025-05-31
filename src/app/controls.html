@@ -1,4 +1,8 @@
 <style>
+    table {
+        width: 100%;
+    }
+
     button {
         font-size: larger;
     }
@@ -6,14 +10,30 @@
     .current-date {
         font-style: italic;
     }
+
+    .language {
+        text-align: right;
+    }
 </style>
 <div id="controls">
-    <button (click)="displayPrevDay()">Previous Day</button>
-    @if ( ! isOnToday() ) {
-    &nbsp;
-    <button [disabled] = "isOnToday()" (click)="displayToday()">Today</button>
-    &nbsp;
-    <button [disabled] = "isOnToday()" (click)="displayNextDay()">Next Day</button>
-    }
+    <table>
+        <tr>
+            <td>
+                <button (click)="displayPrevDay()">Previous Day</button>
+                @if ( ! isOnToday() ) {
+                &nbsp;
+                <button [disabled] = "isOnToday()" (click)="displayToday()">Today</button>
+                &nbsp;
+                <button [disabled] = "isOnToday()" (click)="displayNextDay()">Next Day</button>
+                }
+            </td>
+            <td class="language">
+                <label for="language">Language: </label>
+                <select [(ngModel)]="selectedValue" (ngModelChange)="updateLanguageId()">
+                    <option *ngFor="let lang of supportedLanguages" [ngValue]="lang.id">{{lang.name}}</option>
+                </select>
+            </td>
+        </tr>
+    </table>
 </div>
 <div class="current-date">{{ currentDate() | date }}</div>
