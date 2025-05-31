@@ -62,14 +62,22 @@ export class Controls {
         : this.currentDate().getUTCDate().toString();
     let dateString = `${ this.currentDate().getUTCFullYear() }/${ normalizedMonth}/${ normalizedDay }`;
 
-    let response = await fetch(`https://api.wikimedia.org/feed/v1/wikipedia/en/featured/${dateString}`,
-      {
-          headers: {
-              'Authorization': 'Bearer ' + this.token,
-              'Api-User-Agent': 'test-angular'
-          }
-      }
-    );
-    response.json().then((value) => { this.dataAvailable.emit(value) });
+    let storedData = sessionStorage.getItem(dateString);
+    if ( storedData == null ) {
+      let response = await fetch(`https://api.wikimedia.org/feed/v1/wikipedia/en/featured/${dateString}`,
+        {
+            headers: {
+                'Authorization': 'Bearer ' + this.token,
+                'Api-User-Agent': 'test-angular'
+            }
+        }
+      );
+      response.json().then((value) => { 
+        this.dataAvailable.emit(value);
+        sessionStorage.setItem(dateString, value.stringify())
+      });
+    } else {
+      this.dataAvailable.emit(JSON.parse(storedData));
+    }
   }
 }

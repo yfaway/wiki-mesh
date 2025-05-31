@@ -19,12 +19,13 @@
     {
         <p>Loading...</p>
     }
+    @else {
     <table>
         <tr>
             <th class='header-article'>Article</th>
             <th class="views">Views</th>
         </tr>
-    @for ( article of articles(); track article.title ) {
+        @for ( article of articles(); track article.title ) {
         <tr>
             <td>
                 <div><a href="{{ article.url }}" target="_blank">{{ article.title }}</a></div>
@@ -32,6 +33,7 @@
             </td>
             <td class="views">{{ article.views | number: '1.0-0'}}</td>
         </tr>
-    }
+        }
     </table>
+    }
 </div>
