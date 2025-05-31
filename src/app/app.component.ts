@@ -39,24 +39,28 @@ export class AppComponent {
 
   updateComponents(value: any) {
     console.log(value);
-    this.featuredArticle().update(value.tfa.titles.canonical, 
-      value.tfa.thumbnail.source, value.tfa.description, value.tfa.content_urls.desktop.page);
-
-    let articles : Array<MostReadArticle> = [];
-    for (let article of value.mostread.articles) {
-      let obj : MostReadArticle = {
-        date: article.date,
-        rank: article.rank,
-        views: article.views,
-        namespace: article.namespace.text,
-        title: article.titles.canonical,
-        description: article.description,
-        url: article.content_urls.desktop.page
-      };
-
-      articles.push(obj);
+    if ( value.tfa ) {
+      this.featuredArticle().update(value.tfa.titles.canonical,
+        value.tfa.thumbnail.source, value.tfa.description, value.tfa.content_urls.desktop.page);
     }
-    this.mostReadComponent().articles.set(articles);
+
+    if ( value.mostread ) {
+      let articles: Array<MostReadArticle> = [];
+      for (let article of value.mostread.articles) {
+        let obj: MostReadArticle = {
+          date: article.date,
+          rank: article.rank,
+          views: article.views,
+          namespace: article.namespace.text,
+          title: article.titles.canonical,
+          description: article.description,
+          url: article.content_urls.desktop.page
+        };
+
+        articles.push(obj);
+      }
+      this.mostReadComponent().articles.set(articles);
+    }
 
     if (value.news) {
       let newsArticles: Array<News> = [];

@@ -9,6 +9,7 @@
 
     .current-date {
         font-style: italic;
+        margin-left: 14px;
     }
 
     .language {
@@ -19,21 +20,25 @@
     <table>
         <tr>
             <td>
-                <button (click)="displayPrevDay()">Previous Day</button>
+                <button mat-button="elevated" (click)="displayPrevDay()">Previous Day</button>
                 @if ( ! isOnToday() ) {
                 &nbsp;
-                <button [disabled] = "isOnToday()" (click)="displayToday()">Today</button>
+                <button mat-button="filled" (click)="displayToday()">Today</button>
                 &nbsp;
-                <button [disabled] = "isOnToday()" (click)="displayNextDay()">Next Day</button>
+                <button mat-button="filled" (click)="displayNextDay()">Next Day</button>
                 }
+                <div class="current-date">{{ currentDate() | date }}</div>
             </td>
             <td class="language">
-                <label for="language">Language: </label>
-                <select [(ngModel)]="selectedValue" (ngModelChange)="updateLanguageId()">
-                    <option *ngFor="let lang of supportedLanguages" [ngValue]="lang.id">{{lang.name}}</option>
-                </select>
+                <mat-form-field>
+                <mat-label>Language</mat-label>
+                <mat-select [(ngModel)]="selectedValue" (ngModelChange)="updateLanguageId()">
+                    @for (lang of supportedLanguages; track lang) {
+                        <mat-option [value]="lang.id">{{lang.name}}</mat-option>
+                    }
+                </mat-select>
+                </mat-form-field>
             </td>
         </tr>
     </table>
 </div>
-<div class="current-date">{{ currentDate() | date }}</div>

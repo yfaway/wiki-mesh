@@ -2,6 +2,8 @@ import { Output, Component, EventEmitter, signal } from '@angular/core';
 import { DatePipe, NgFor } from '@angular/common';
 import * as tokens from '../../tokens.json';
 import { FormsModule } from '@angular/forms';
+import {MatButtonModule} from '@angular/material/button'; 
+import {MatSelectModule} from '@angular/material/select';
 
 /**
  * Contains the button to navigate the day.
@@ -9,7 +11,7 @@ import { FormsModule } from '@angular/forms';
 
 @Component({
   selector: 'controls',
-  imports: [DatePipe, FormsModule, NgFor],
+  imports: [MatSelectModule, MatButtonModule, DatePipe, FormsModule],
   templateUrl: './controls.html',
 })
 export class Controls {
