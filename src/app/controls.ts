@@ -1,9 +1,16 @@
-import { Output, Component, EventEmitter, signal } from '@angular/core';
-import { DatePipe, NgFor } from '@angular/common';
-import * as tokens from '../../tokens.json';
+import { Output, Component, EventEmitter, inject , signal } from '@angular/core';
+import { DatePipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import {MatButtonModule} from '@angular/material/button'; 
 import {MatSelectModule} from '@angular/material/select';
+import {
+  MatDialog,
+} from '@angular/material/dialog';
+import {MatFormFieldModule} from '@angular/material/form-field';
+import {MatInputModule} from '@angular/material/input';
+
+
+import { TokenData, PromptApiTokenDialog } from './prompt-api-token-dialog';
 
 /**
  * Contains the button to navigate the day.
@@ -11,14 +18,17 @@ import {MatSelectModule} from '@angular/material/select';
 
 @Component({
   selector: 'controls',
-  imports: [MatSelectModule, MatButtonModule, DatePipe, FormsModule],
+  imports: [MatSelectModule, MatButtonModule, DatePipe, FormsModule,
+    MatFormFieldModule, MatInputModule, FormsModule, MatButtonModule],
   templateUrl: './controls.html',
 })
 export class Controls {
   @Output() dataAvailable = new EventEmitter<Object>();
   @Output() dataReset = new EventEmitter<void>();
 
-  readonly token = tokens.wikimedia
+  readonly tokenKey = 'token';
+  token = signal(localStorage.getItem(this.tokenKey));
+  readonly dialog = inject(MatDialog);
 
   currentDate = signal(new Date());
   selectedValue = "en";
@@ -42,6 +52,32 @@ export class Controls {
     { "id": "sv", "name": "Svenska" },
     { "id": "vi", "name": "Tiếng Việt" },
   ];
+
+  /**
+   * Check if there is already an API Token in local storage. If not, prompt for the token & store them, and then
+   * fetch today's data.
+   */
+  ngOnInit() {
+    sessionStorage.clear();
+
+    if ( ! this.token() ) {
+      const dialogRef = this.dialog.open(PromptApiTokenDialog, {
+        data: {token: ''},
+      });
+
+      dialogRef.afterClosed().subscribe(result => {
+        if (result !== undefined) {
+          this.token.set(result);
+          localStorage.setItem(this.tokenKey, result);
+
+          this.getData();
+        }
+      });    
+    }
+    else {
+      this.getData();
+    }
+  }
 
   constructor() {
   }
@@ -75,10 +111,6 @@ export class Controls {
     this.getData();
   }
 
-  ngOnInit() {
-    this.getData();
-  }
-
   async getData() {
     this.dataReset.emit();
 
@@ -96,7 +128,7 @@ export class Controls {
       let response = await fetch(`https://api.wikimedia.org/feed/v1/wikipedia/${this.selectedValue}/featured/${dateString}`,
         {
             headers: {
-                'Authorization': 'Bearer ' + this.token,
+                'Authorization': 'Bearer ' + this.token(),
                 'Api-User-Agent': 'test-angular'
             }
         }

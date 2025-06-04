@@ -1,11 +1,10 @@
-import { Component, signal, viewChild } from '@angular/core';
-import { DatePipe } from '@angular/common';
+import { Component, viewChild } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
+
 import { Controls } from './controls';
 import { FeaturedArticles } from './featured-articles';
 import { MostReadArticle, MostReadArticlesComponent } from './most-read-articles';
 import { News, NewsComponent } from './news';
-import * as tokens from '../../tokens.json';
 
 /**
  * The root component to control several sections:
@@ -13,7 +12,6 @@ import * as tokens from '../../tokens.json';
  *   - Previous day's most read articles
  *   - Today's news
  */
-
 @Component({
   selector: 'app-root',
   imports: [RouterOutlet, Controls, FeaturedArticles, MostReadArticlesComponent, NewsComponent],
@@ -21,12 +19,9 @@ import * as tokens from '../../tokens.json';
   styleUrl: './app.component.css'
 })
 export class AppComponent {
-  readonly token = tokens.wikimedia
-
   featuredArticle = viewChild.required(FeaturedArticles);
   mostReadComponent = viewChild.required(MostReadArticlesComponent);
   newsComponent = viewChild.required(NewsComponent);
-  currentDate = signal(new Date());
 
   constructor() {
   }
@@ -41,7 +36,7 @@ export class AppComponent {
     console.log(value);
     if ( value.tfa ) {
       this.featuredArticle().update(value.tfa.titles.canonical,
-        value.tfa.thumbnail.source, value.tfa.description, value.tfa.content_urls.desktop.page);
+        value.tfa.thumbnail ? value.tfa.thumbnail.source : '', value.tfa.description, value.tfa.content_urls.desktop.page);
     }
 
     if ( value.mostread ) {
